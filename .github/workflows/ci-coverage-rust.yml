@@ -5,25 +5,26 @@ on:
   workflow_call:
 
 env:
+  RUST_BACKTRACE: 1
   CARGO_TERM_COLOR: always
+  IGGY_CI_BUILD: true
   GITHUB_BOT_CONTEXT_STRING: "coveralls coverage reporting job"
 
 jobs:
   coverage:
-    name: Code coverage
+    name: coverage
     runs-on: ubuntu-latest
-    env:
-      CARGO_TERM_COLOR: always
+    timeout-minutes: 30
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Cache cargo & target directories
         uses: Swatinem/rust-cache@v2
         with:
-          key: "v2"
+          key: "coverage"
 
-      - name: Install gnome-keyring and keyutils on Linux
+      - name: Install gnome-keyring, keyutils and lcov
         run: |
           sudo apt-get update --yes && sudo apt-get install --yes gnome-keyring keyutils lcov
           rm -f $HOME/.local/share/keyrings/*
