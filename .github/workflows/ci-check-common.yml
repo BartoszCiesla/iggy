@@ -18,6 +18,7 @@ jobs:
   check-commit-message:
     name: commit messages
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Check subject line length
         uses: gsactions/commit-message-checker@v2
