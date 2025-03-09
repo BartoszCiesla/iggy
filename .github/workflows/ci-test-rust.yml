@@ -41,9 +41,9 @@ jobs:
         shell: bash
         run: echo "VERBOSE_FLAG=$([[ "${RUNNER_DEBUG}" = "1" ]] && echo "--verbose" || echo "")" >> $GITHUB_ENV
       - name: Build binary ${{ env.TARGET }}
-        run: cross +stable build ${{ env.VERBOSE_FLAG }} --target ${{ env.TARGET }}
+        run: cargo build ${{ env.VERBOSE_FLAG }} --target ${{ env.TARGET }}
       - name: Run tests ${{ env.TARGET }}
-        run: cross +stable test ${{ env.VERBOSE_FLAG }} --target ${{ env.TARGET }}
+        run: cargo test ${{ env.VERBOSE_FLAG }} --target ${{ env.TARGET }}
       - name: Check CLI examples from README
         run: ./scripts/run-examples-from-readme.sh
       - name: Check if workspace is clean
@@ -82,9 +82,9 @@ jobs:
         shell: bash
         run: echo "VERBOSE_FLAG=$([[ "${RUNNER_DEBUG}" = "1" ]] && echo "--verbose" || echo "")" >> $GITHUB_ENV
       - name: Build binary ${{ env.TARGET }}
-        run: cross +stable build ${{ env.VERBOSE_FLAG }} --target ${{ env.TARGET }}
+        run: cargo build ${{ env.VERBOSE_FLAG }} --target ${{ env.TARGET }}
       - name: Run tests ${{ env.TARGET }}
-        run: cross +stable test ${{ env.VERBOSE_FLAG }} --target ${{ env.TARGET }}
+        run: cargo test ${{ env.VERBOSE_FLAG }} --target ${{ env.TARGET }}
       - name: Check CLI examples from README
         run: ./scripts/run-examples-from-readme.sh
       - name: Check if workspace is clean
