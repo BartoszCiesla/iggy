@@ -1,4 +1,5 @@
 name: ci-check-common
+
 on:
   workflow_call:
     inputs:
@@ -16,6 +17,20 @@ on:
 jobs:
   check-commit-message:
     name: commit messages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check subject line length
+        uses: gsactions/commit-message-checker@v2
+        with:
+          excludeDescription: "false" # exclude description body of a pull request
+          excludeTitle: "false" # exclude the title of a pull request
+          checkAllCommitMessages: "false" # checks all commits associated with the pull request
+          accessToken: ${{ secrets.GITHUB_TOKEN }} # needed only when checkAllCommitMessages is true
+          pattern: '^.{0,80}(\n.*)*$'
+          error: "Subject of all commits in the PR and PR body/title has to be shorter than 80 characters."
+
+  check-conventional-commits:
+    name: conventional commits
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

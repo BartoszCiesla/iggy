@@ -1,4 +1,5 @@
 name: backwards_compatibility
+
 on:
   workflow_call:
     inputs:
