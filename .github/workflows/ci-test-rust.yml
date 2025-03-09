@@ -9,7 +9,7 @@ env:
   IGGY_CI_BUILD: true
 
 jobs:
-  linux-builds:
+  x86_64-unknown-linux:
     name: ${{ matrix.target }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -77,10 +77,3 @@ jobs:
         run: cargo build ${{ env.VERBOSE_FLAG }} --target x86_64-pc-windows-msvc --bin iggy
       - name: Check if workspace is clean
         run: git status | grep "working tree clean" || { git status ; exit 1; }
-
-  backwards_compatibility:
-    if: github.event_name == 'pull_request'
-    name: backwards_compatibility
-    uses: ./.github/workflows/backwards_compatibility.yml
-    with:
-      pr_body: ${{ github.event.pull_request.body }}

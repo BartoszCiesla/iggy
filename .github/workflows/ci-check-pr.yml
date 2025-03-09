@@ -29,20 +29,16 @@ jobs:
               - Cargo.lock
             shell:
               - 'scripts/**/*.sh'
-      - name: List all changed rust file(s)
-        if: steps.changed-files-yaml.outputs.rust_any_changed == 'true'
-        env:
-          RUST_ALL_CHANGED_FILES: ${{ steps.changed-files-yaml.outputs.rust_all_changed_files }}
+      - name: List all changed files
         run: |
-          echo "One or more rust file(s) has changed."
-          echo "List all the files that have changed: ${RUST_ALL_CHANGED_FILES}"
-      - name: List all changed shell file(s)
-        if: steps.changed-files-yaml.outputs.shell_any_changed == 'true'
-        env:
-          SHELL_ALL_CHANGED_FILES: ${{ steps.changed-files-yaml.outputs.shell_all_changed_files }}
-        run: |
-          echo "One or more shell file(s) has changed."
-          echo "List all the files that have changed: ${SHELL_ALL_CHANGED_FILES}"
+          if [ "${{ steps.changed-files-yaml.outputs.rust_any_changed }}" == "true" ]; then
+            echo "One or more rust file(s) has changed."
+            echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.rust_all_changed_files }}"
+          fi
+          if [ "${{ steps.changed-files-yaml.outputs.shell_any_changed }}" == "true" ]; then
+            echo "One or more shell file(s) has changed."
+            echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.shell_all_changed_files }}"
+          fi
 
   ci-check-common:
     name: ci-check-common
@@ -69,6 +65,14 @@ jobs:
     if: ${{ needs.ci-check-rust.result == 'success' }}
     uses: ./.github/workflows/ci-test-rust-optional.yml
 
+  ci-compatibility-rust:
+    name: ci-compatibility-rust
+    needs: ci-check-rust
+    if: ${{ needs.ci-check-rust.result == 'success' }}
+    uses: ./.github/workflows/ci-compatibility-rust.yml
+    with:
+      pr_body: ${{ github.event.pull_request.body }}
+
   ci-check-shell:
     name: ci-check-shell
     needs: pr-file-changes
@@ -81,6 +85,8 @@ jobs:
       - ci-check-common
       - ci-check-rust
       - ci-test-rust
+      - ci-compatibility-rust
+      - ci-check-shell
     if: always()
     steps:
       - name: Everything is fine

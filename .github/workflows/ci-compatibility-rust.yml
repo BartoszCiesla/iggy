@@ -160,4 +160,3 @@ jobs:
 
       - name: Print server logs (PR)
         run: cat local_data/logs/iggy*
-

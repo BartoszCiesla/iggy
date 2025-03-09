@@ -9,8 +9,8 @@ env:
   IGGY_CI_BUILD: true
 
 jobs:
-  coverage:
-    name: coverage
+  ci-coverage-rust:
+    name: ci-coverage-rust
     uses: ./.github/workflows/ci-coverage-rust.yml
 
   aarch64-apple-darwin:
