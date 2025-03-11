@@ -22,44 +22,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check if Cargo.toml and Cargo.lock are changed
-        uses: tj-actions/changed-files@v45
-        id: all_changed_files
-        with:
-          files: |
-            Cargo.lock
-            server/Cargo.toml
+      - name: Extract tag name
+        id: extract_tag
+        run: |
+          tag=${GITHUB_REF#refs/tags/}
+          echo "tag_name=$tag" >> "$GITHUB_OUTPUT"
+          echo "::notice ::Tag that triggered the workflow: $tag"
 
       - name: Extract iggy-server version from Cargo.toml
-        if: ${{ steps.all_changed_files.outputs.all_changed_files == 'Cargo.lock server/Cargo.toml' }}
         id: extract_version
         run: |
           version=$(cargo pkgid -p server | cut -d# -f2 | cut -d: -f2)
           echo "server_version=$version" >> "$GITHUB_OUTPUT"
           echo "::notice ::Version from Cargo.toml $version"
 
-      - name: Check if version is a Git tag
-        uses: mukunku/tag-exists-action@v1.6.0
-        if: ${{ steps.all_changed_files.outputs.all_changed_files == 'Cargo.lock server/Cargo.toml' }}
+      - name: Check if version from Cargo.toml is the same as the tag
         id: check_git_tag
-        with:
-          tag: "server-${{ steps.extract_version.outputs.server_version }}"
-
-      - name: Print message
-        if: ${{ steps.check_git_tag.outputs.exists == 'true' }}
         run: |
-          echo "::notice ::Tag server-${{ steps.extract_version.outputs.server_version }} exists, skipping tag creation"
-
-      - name: Create tag
-        if: ${{ steps.check_git_tag.outputs.exists == 'false' }}
-        id: tagging
-        run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git tag -a server-${{ steps.extract_version.outputs.server_version }} -m "server-${{ steps.extract_version.outputs.server_version }}"
-          git push origin server-${{ steps.extract_version.outputs.server_version }}
-          echo "::notice ::Created server-${{ steps.extract_version.outputs.server_version }} tag"
-          echo "tag_created=true" >> "$GITHUB_OUTPUT"
+          if [[ "iggy-${{ steps.extract_version.outputs.server_version }}" == "${{ steps.extract_tag.outputs.tag_name }}" ]];
+          then
+            echo "::notice ::Tag ${{ steps.extract_tag.outputs.tag_name }} matches the version in Cargo.toml"
+            echo "tag_matches=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning ::Tag ${{ steps.extract_tag.outputs.tag_name }} does not matche the version from Cargo.toml"
+            echo "tag_matches=false" >> "$GITHUB_OUTPUT"
+          fi
 
     outputs:
       server_version: ${{ steps.extract_version.outputs.server_version }}

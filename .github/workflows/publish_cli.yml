@@ -42,6 +42,7 @@ jobs:
             echo "::warning ::Tag ${{ steps.extract_tag.outputs.tag_name }} does not matche the version from Cargo.toml"
             echo "tag_matches=false" >> "$GITHUB_OUTPUT"
           fi
+
     outputs:
       iggy_cli_version: ${{ steps.extract_tag.outputs.tag_name }}
       tag_created: ${{ steps.check_git_tag.outputs.tag_matches }}
